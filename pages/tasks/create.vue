@@ -2,7 +2,7 @@
   <div class="flex items-center justify-center">
     <u-card class="w-2xl">
       <h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
-        Tambah Tugas Baru
+        Tambah Task Baru
       </h1>
 
       <u-form
@@ -11,7 +11,7 @@
         class="space-y-6"
         @submit="onSubmit"
       >
-        <u-form-field label="Judul Tugas" name="title" required>
+        <u-form-field label="Judul Task" name="title" required>
           <u-input
             v-model="state.title"
             placeholder="Misal: Buat laporan keuangan Q3"
@@ -64,7 +64,7 @@
             :loading="loading"
             :disabled="loading"
           >
-            Tambahkan Tugas
+            Tambahkan Task
           </u-button>
         </div>
       </u-form>
@@ -119,8 +119,8 @@ async function onSubmit(event: FormSubmitEvent<CreateTaskSchemaType>) {
     });
 
     toast.add({
-      title: "Tugas Berhasil Ditambahkan!",
-      description: `Tugas telah berhasil dibuat.`,
+      title: "Task Berhasil Ditambahkan!",
+      description: `Task telah berhasil dibuat.`,
       icon: "i-heroicons-check-circle",
       color: "success",
     });
@@ -129,7 +129,7 @@ async function onSubmit(event: FormSubmitEvent<CreateTaskSchemaType>) {
   } catch (err: any) {
     console.error("Gagal menambahkan tugas:", err);
     toast.add({
-      title: "Gagal Menambahkan Tugas",
+      title: "Gagal Menambahkan Task",
       description:
         err.data?.message ||
         "Terjadi kesalahan saat menyimpan tugas. Silakan coba lagi.",

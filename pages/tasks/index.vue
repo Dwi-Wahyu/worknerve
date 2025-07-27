@@ -1,19 +1,21 @@
 <template>
   <div class="flex justify-between mb-6 items-center">
     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-      Daftar Tugas
+      Daftar Task
     </h1>
 
     <u-button
       @click="navigateTo('/tasks/create')"
       icon="lucide-plus"
-      label="Tambahkan Tugas"
+      label="Input Task"
     />
   </div>
 
   <div v-if="pending" class="flex justify-center items-center h-64">
     <u-icon name="i-lucide-loader" class="size-5 animate-spin" />
-    <p class="ml-3 text-lg text-gray-600 dark:text-gray-300">Memuat tugas...</p>
+    <p class="ml-3 text-lg text-gray-600 dark:text-gray-300">
+      Loading Task ...
+    </p>
   </div>
 
   <u-alert
@@ -31,7 +33,7 @@
 
   <div
     v-else-if="tasksByUrgency && Object.keys(tasksByUrgency).length"
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+    class="grid grid-cols-1 gap-6"
   >
     <u-card
       v-for="(tasks, urgency) in tasksByUrgency"
@@ -55,7 +57,9 @@
         </div>
       </template>
 
-      <div class="flex-grow space-y-4 max-h-[calc(100vh-200px)] pr-2 -mr-2">
+      <div
+        class="space-y-4 grow grid grid-cols-1 md:grid-cols-2 max-h-[calc(100vh-200px)] gap-5"
+      >
         <template v-for="task in tasks" :key="task.id">
           <widgets-task-card :task="task" :refresh="refresh" />
         </template>
@@ -63,7 +67,7 @@
           v-if="tasks.length === 0"
           class="text-gray-500 dark:text-gray-400 text-center py-4"
         >
-          Tidak ada tugas di kategori ini.
+          Tidak ada task di kategori ini.
         </p>
       </div>
     </u-card>
