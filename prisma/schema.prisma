@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id       String  @id @default(uuid())
+  email    String  @unique
+  name     String?
+  password String
+  tasks    Task[]
+
+  servers     Server[]
+  credentials Credential[]
+  application Application[]
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      Status   @default(PENDING)
+  urgency     Urgency  @default(MEDIUM)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([title, userId])
+}
+
+model Server {
+  id          Int     @id @default(autoincrement())
+  name        String
+  ip          String?
+  description String?
+
+  applications Application[]
+  credentials  Credential[]
+  user         User?         @relation(fields: [userId], references: [id])
+  userId       String?
+}
+
+model Credential {
+  id          Int     @id @default(autoincrement())
+  title       String
+  key         String
+  value       String
+  description String?
+
+  server        Server?      @relation(fields: [serverId], references: [id])
+  serverId      Int?
+  application   Application? @relation(fields: [applicationId], references: [id])
+  applicationId Int?
+  user          User?        @relation(fields: [userId], references: [id])
+  userId        String?
+}
+
+model Application {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  logo        String?
+  url         String?
+  port        String
+  server      Server? @relation(fields: [serverId], references: [id])
+  serverId    Int?
+
+  credentials Credential[]
+  user        User?        @relation(fields: [userId], references: [id])
+  userId      String?
+}
+
+enum Urgency {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Status {
+  PENDING
+  PROGRESS
+  BLOCKED
+  COMPLETED
+  CANCELLED
+}
