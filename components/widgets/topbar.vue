@@ -70,7 +70,10 @@ const dropdownItems = ref<DropdownMenuItem[]>([
 
 <template>
   <u-container class="w-full justify-between flex items-center mt-4">
-    <h1>WorkNest</h1>
+    <div class="flex gap-2 items-center">
+      <img src="/favicon.svg" width="25" height="25" alt="" />
+      <h1 class="text-lg font-semibold">WorkNerve</h1>
+    </div>
 
     <u-navigation-menu class="hidden md:block" :items="navigationItems" />
 

@@ -43,6 +43,7 @@
                   label="Hapus"
                   color="error"
                   variant="subtle"
+                  :loading="deleteLoading"
                 />
 
                 <u-button
@@ -84,6 +85,7 @@
           class="cursor-pointer"
           color="success"
           variant="subtle"
+          :loading="statusButtonLoading === 'COMPLETED'"
         />
 
         <u-button
@@ -92,6 +94,7 @@
           class="cursor-pointer"
           color="info"
           variant="subtle"
+          :loading="statusButtonLoading === 'PROGRESS'"
         />
 
         <u-button
@@ -100,6 +103,7 @@
           class="cursor-pointer"
           color="error"
           variant="subtle"
+          :loading="statusButtonLoading === 'CANCELLED'"
         />
 
         <u-button
@@ -108,6 +112,7 @@
           class="cursor-pointer"
           color="warning"
           variant="subtle"
+          :loading="statusButtonLoading === 'BLOCKED'"
         />
       </div>
     </div>
@@ -133,12 +138,17 @@ const toast = useToast();
 
 const open = ref(false);
 
+const statusButtonLoading = ref("");
+const deleteLoading = ref(false);
+
 function toggleOpen() {
   open.value = !open.value;
   console.log(open.value);
 }
 
 async function handleChangeStatus(status: string) {
+  statusButtonLoading.value = status;
+
   const response = await $fetch("/api/tasks/change-status", {
     method: "POST",
     query: {
@@ -159,9 +169,13 @@ async function handleChangeStatus(status: string) {
 
     props.refresh();
   }
+
+  statusButtonLoading.value = "";
 }
 
 async function handleHapus() {
+  deleteLoading.value = true;
+
   const response = await $fetch("/api/tasks/", {
     method: "DELETE",
     query: {
@@ -181,6 +195,8 @@ async function handleHapus() {
 
     props.refresh();
   }
+
+  deleteLoading.value = false;
 }
 
 const formatDate = (dateString: Date) => {

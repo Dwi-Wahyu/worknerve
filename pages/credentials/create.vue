@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-center justify-center">
     <u-card class="w-2xl">
-      <h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+      <h1 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">
         Tambah Kredensial Baru
       </h1>
 

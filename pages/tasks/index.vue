@@ -1,14 +1,31 @@
 <template>
-  <div class="flex justify-between mb-6 items-center">
+  <div
+    class="flex flex-col md:flex-row gap-4 justify-between mb-6 items-center"
+  >
     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
       Daftar Task
     </h1>
 
-    <u-button
-      @click="navigateTo('/tasks/create')"
-      icon="lucide-plus"
-      label="Input Task"
-    />
+    <div>
+      <u-dropdown-menu
+        :items="items"
+        :content="{ align: 'center' }"
+        class="mr-3"
+      >
+        <u-button
+          label="Urgensi"
+          color="neutral"
+          variant="outline"
+          icon="lucide:siren"
+        />
+      </u-dropdown-menu>
+
+      <u-button
+        @click="navigateTo('/tasks/create')"
+        icon="lucide-plus"
+        label="Input Task"
+      />
+    </div>
   </div>
 
   <div v-if="pending" class="flex justify-center items-center h-64">
@@ -57,15 +74,13 @@
         </div>
       </template>
 
-      <div
-        class="space-y-4 grow grid grid-cols-1 md:grid-cols-2 max-h-[calc(100vh-200px)] gap-5"
-      >
+      <div class="space-y-4 grow grid grid-cols-1 md:grid-cols-2 gap-5">
         <template v-for="task in tasks" :key="task.id">
           <widgets-task-card :task="task" :refresh="refresh" />
         </template>
         <p
           v-if="tasks.length === 0"
-          class="text-gray-500 dark:text-gray-400 text-center py-4"
+          class="text-gray-500 dark:text-gray-400 col-span-2 text-center py-4"
         >
           Tidak ada task di kategori ini.
         </p>
@@ -85,6 +100,7 @@
 </template>
 
 <script setup lang="ts">
+import type { DropdownMenuItem } from "@nuxt/ui";
 import { computed } from "vue";
 import { useMyFetch } from "~/composables/useMyFetch";
 import {
@@ -107,6 +123,11 @@ const {
   lazy: true,
 });
 
+const showKritisTask = ref(true);
+const showTinggiTask = ref(true);
+const showSedangTask = ref(true);
+const showRendahTask = ref(true);
+
 const tasksByUrgency = computed(() => {
   const grouped: Record<Urgency, Task[]> = {
     CRITICAL: [],
@@ -117,13 +138,62 @@ const tasksByUrgency = computed(() => {
 
   if (tasks.value) {
     tasks.value.forEach((task) => {
-      if (grouped[task.urgency]) {
-        grouped[task.urgency].push(task);
+      if (
+        (task.urgency === "CRITICAL" && showKritisTask.value) ||
+        (task.urgency === "HIGH" && showTinggiTask.value) ||
+        (task.urgency === "MEDIUM" && showSedangTask.value) ||
+        (task.urgency === "LOW" && showRendahTask.value)
+      ) {
+        if (grouped[task.urgency]) {
+          grouped[task.urgency].push(task);
+        }
       }
     });
   }
+
   return grouped;
 });
+
+const items = computed(
+  () =>
+    [
+      {
+        label: "Kritis",
+        type: "checkbox" as const,
+        checked: showKritisTask.value,
+        onUpdateChecked(checked: boolean) {
+          showKritisTask.value = checked;
+        },
+        onSelect(e: Event) {
+          e.preventDefault();
+        },
+      },
+      {
+        label: "Tinggi",
+        type: "checkbox" as const,
+        checked: showTinggiTask.value,
+        onUpdateChecked(checked: boolean) {
+          showTinggiTask.value = checked;
+        },
+      },
+      {
+        label: "Sedang",
+        type: "checkbox" as const,
+        checked: showSedangTask.value,
+        onUpdateChecked(checked: boolean) {
+          showSedangTask.value = checked;
+        },
+      },
+      {
+        label: "Rendah",
+        type: "checkbox" as const,
+        checked: showRendahTask.value,
+        onUpdateChecked(checked: boolean) {
+          showRendahTask.value = checked;
+        },
+      },
+    ] satisfies DropdownMenuItem[]
+);
 </script>
 
 <style scoped>

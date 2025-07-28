@@ -113,7 +113,9 @@ onMounted(() => {
           />
         </u-form-field>
 
-        <u-button type="submit" block color="primary">Login</u-button>
+        <u-button type="submit" block color="primary" :loading="loading"
+          >Login</u-button
+        >
       </u-form>
     </u-card>
   </div>
