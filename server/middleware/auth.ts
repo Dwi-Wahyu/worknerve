@@ -1,5 +1,6 @@
+import { defineEventHandler, getHeader, createError, sendRedirect } from "h3";
+
 import jwt from "jsonwebtoken";
-import { defineEventHandler, getHeader, createError } from "h3";
 
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
@@ -11,6 +12,7 @@ export default defineEventHandler(async (event) => {
   const authHeader = getHeader(event, "Authorization");
 
   if (!authHeader) {
+    sendRedirect(event, "/");
     throw createError({
       statusCode: 401,
       statusMessage: "Unauthorized",

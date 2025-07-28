@@ -2,11 +2,29 @@
   <div
     class="flex flex-col md:flex-row gap-4 justify-between mb-6 items-center"
   >
-    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-      Daftar Task
-    </h1>
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        Task List
+      </h1>
+      <p class="text-gray-600 text-sm dark:text-gray-300">
+        View, organize, and track your tasks efficiently from this interface.
+      </p>
+    </div>
 
     <div>
+      <u-popover :popper="{ placement: 'bottom-start' }" class="mr-3">
+        <u-button
+          icon="i-heroicons-calendar-days-20-solid"
+          variant="outline"
+          color="neutral"
+          :label="format(date, 'd MMM, yyy')"
+        />
+
+        <template #panel="{ close }">
+          <Datepicker v-model="date" is-required @close="close" />
+        </template>
+      </u-popover>
+
       <u-dropdown-menu
         :items="items"
         :content="{ align: 'center' }"
@@ -110,9 +128,14 @@ import {
 } from "~/helper/task-helper";
 import type { Task, Urgency } from "~/schema/task";
 
+import { format } from "date-fns";
+import Datepicker from "~/components/ui/datepicker.vue";
+
 definePageMeta({
   middleware: "auth",
 });
+
+const date = ref(new Date());
 
 const {
   data: tasks,

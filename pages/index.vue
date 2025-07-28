@@ -22,12 +22,6 @@ const toast = useToast();
 async function onSubmit(event: FormSubmitEvent<LoginSchemaType>) {
   loading.value = true;
 
-  toast.add({
-    title: "Success",
-    description: "The form has been submitted.",
-    color: "success",
-  });
-
   try {
     const res = await $fetch("/api/login", {
       method: "POST",
@@ -38,19 +32,30 @@ async function onSubmit(event: FormSubmitEvent<LoginSchemaType>) {
     });
 
     if (res.success) {
-      message.value = "Login berhasil!";
-
-      console.log(res.token);
+      toast.add({
+        title: "Login Berhasil",
+        description: "Anda berhasil masuk ke sistem.",
+        color: "success",
+      });
 
       authStore.user = res.user;
       authStore.token = res.token;
 
       navigateTo("/tasks");
     } else {
-      message.value = "Login gagal. Coba lagi.";
+      toast.add({
+        title: "Login Gagal",
+        description: "Username atau Password anda salah.",
+        color: "success",
+      });
     }
   } catch (err) {
-    message.value = "Terjadi kesalahan server.";
+    toast.add({
+      title: "Login Gagal",
+      description: "Terjadi kesalahan server.",
+      color: "success",
+    });
+
     console.error(err);
   } finally {
     loading.value = false;
@@ -66,8 +71,6 @@ async function onError(event: FormErrorEvent) {
 }
 
 onMounted(() => {
-  console.log(authStore.isTokenExpired);
-
   if (!authStore.isTokenExpired) {
     navigateTo("/tasks");
   }
