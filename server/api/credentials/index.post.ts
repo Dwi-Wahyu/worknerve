@@ -1,12 +1,12 @@
 import { createError } from "h3";
 import prisma from "~/lib/prisma";
 import {
-  CreateCredentialPayload,
   createCredentialSchema,
+  CreateCredentialSchemaType,
 } from "~/schema/credentials";
 
 export default defineEventHandler(async (event) => {
-  let body: CreateCredentialPayload;
+  let body: CreateCredentialSchemaType;
 
   const user = event.context.user;
 

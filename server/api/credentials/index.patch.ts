@@ -1,9 +1,12 @@
 import { createError } from "h3";
 import prisma from "~/lib/prisma";
-import { updateTaskSchema, UpdateTaskSchemaType } from "~/schema/task";
+import {
+  updateCredentialSchema,
+  UpdateCredentialSchemaType,
+} from "~/schema/credentials";
 
 export default defineEventHandler(async (event) => {
-  let body: UpdateTaskSchemaType;
+  let body: UpdateCredentialSchemaType;
 
   const user = event.context.user;
 
@@ -24,7 +27,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    await updateTaskSchema.validate(body, { abortEarly: false });
+    await updateCredentialSchema.validate(body, { abortEarly: false });
   } catch (validationError: any) {
     throw createError({
       statusCode: 400,
@@ -34,21 +37,24 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const task = await prisma.task.update({
+    const credential = await prisma.credential.update({
       where: {
         id: parseInt(body.id),
         userId: user.id,
       },
       data: {
         title: body.title,
+        key: body.key,
+        value: body.value,
         description: body.description,
-        status: body.status,
-        urgency: body.urgency,
-        userId: user.id,
+        applicationId: body.applicationId,
+        serverId: body.serverId,
       },
     });
 
-    return task;
+    return {
+      success: true,
+    };
   } catch (error: any) {
     console.error("Error creating credential:", error);
     throw createError({

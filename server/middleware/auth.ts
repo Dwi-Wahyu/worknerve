@@ -5,7 +5,9 @@ import jwt from "jsonwebtoken";
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
 
-  if (["/api/login", "/"].includes(url.pathname)) {
+  if (
+    ["/api/login", "/api/register", "/register", "/"].includes(url.pathname)
+  ) {
     return;
   }
 

@@ -11,25 +11,16 @@
       </p>
     </div>
 
-    <div>
-      <u-popover :popper="{ placement: 'bottom-start' }" class="mr-3">
-        <u-button
-          icon="i-heroicons-calendar-days-20-solid"
-          variant="outline"
-          color="neutral"
-          :label="format(date, 'd MMM, yyy')"
-        />
+    <div class="inline-flex gap-3 items-center">
+      <u-input
+        type="date"
+        v-model="formattedDate"
+        placeholder="YYYY-MM-DD"
+        size="lg"
+        class="max-w-xs"
+      />
 
-        <template #panel="{ close }">
-          <Datepicker v-model="date" is-required @close="close" />
-        </template>
-      </u-popover>
-
-      <u-dropdown-menu
-        :items="items"
-        :content="{ align: 'center' }"
-        class="mr-3"
-      >
+      <u-dropdown-menu :items="items" :content="{ align: 'center' }">
         <u-button
           label="Urgensi"
           color="neutral"
@@ -81,7 +72,7 @@
             class="text-xl font-semibold"
             :class="getUrgencyColorClass(urgency)"
           >
-            {{ formatUrgency(urgency) }}
+            {{ urgency }}
           </h2>
           <u-badge
             :label="tasks.length.toString()"
@@ -100,7 +91,7 @@
           v-if="tasks.length === 0"
           class="text-gray-500 dark:text-gray-400 col-span-2 text-center py-4"
         >
-          Tidak ada task di kategori ini.
+          No tasks found in this category.
         </p>
       </div>
     </u-card>
@@ -111,8 +102,8 @@
     icon="i-heroicons-clipboard-document-list"
     color="info"
     variant="soft"
-    title="Belum Ada Tugas"
-    description="Belum ada tugas yang tersedia. Anda bisa menambahkan tugas baru nanti!"
+    title="No Tasks Available"
+    description="There are currently no tasks available. You can add new tasks later!"
     class="mb-6"
   />
 </template>
@@ -128,14 +119,47 @@ import {
 } from "~/helper/task-helper";
 import type { Task, Urgency } from "~/schema/task";
 
-import { format } from "date-fns";
-import Datepicker from "~/components/ui/datepicker.vue";
+import { format, parseISO } from "date-fns";
 
 definePageMeta({
   middleware: "auth",
 });
 
-const date = ref(new Date());
+const selectedDate = ref<Date | null>(new Date());
+
+const formatDateToString = (date: Date | null): string => {
+  if (!date) return "";
+  return format(date, "yyyy-MM-dd");
+};
+
+const parseStringToDate = (dateString: string): Date | null => {
+  if (!dateString) return null;
+  try {
+    const parsed = parseISO(dateString);
+    if (isNaN(parsed.getTime())) {
+      return null;
+    }
+    return parsed;
+  } catch (e) {
+    console.error("Error parsing date string:", e);
+    return null;
+  }
+};
+
+const formattedDate = computed({
+  get: () => formatDateToString(selectedDate.value),
+  set: (newValue: string) => {
+    selectedDate.value = parseStringToDate(newValue);
+  },
+});
+
+const resetDate = () => {
+  selectedDate.value = null;
+};
+
+watch(selectedDate, (newDate) => {
+  console.log(newDate);
+});
 
 const {
   data: tasks,
@@ -181,7 +205,7 @@ const items = computed(
   () =>
     [
       {
-        label: "Kritis",
+        label: "CRITICAL",
         type: "checkbox" as const,
         checked: showKritisTask.value,
         onUpdateChecked(checked: boolean) {
@@ -192,7 +216,7 @@ const items = computed(
         },
       },
       {
-        label: "Tinggi",
+        label: "HIGH",
         type: "checkbox" as const,
         checked: showTinggiTask.value,
         onUpdateChecked(checked: boolean) {
@@ -200,7 +224,7 @@ const items = computed(
         },
       },
       {
-        label: "Sedang",
+        label: "MEDIUM",
         type: "checkbox" as const,
         checked: showSedangTask.value,
         onUpdateChecked(checked: boolean) {
@@ -208,7 +232,7 @@ const items = computed(
         },
       },
       {
-        label: "Rendah",
+        label: "LOW",
         type: "checkbox" as const,
         checked: showRendahTask.value,
         onUpdateChecked(checked: boolean) {

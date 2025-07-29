@@ -19,6 +19,9 @@ model User {
   password String
   tasks    Task[]
 
+  credentialsPin  String? @map("credentials_pin")
+  lockCredentials Boolean @default(false) @map("lock_credentials")
+
   servers     Server[]
   credentials Credential[]
   application Application[]

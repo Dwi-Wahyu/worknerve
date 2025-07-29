@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormError, FormErrorEvent, FormSubmitEvent } from "@nuxt/ui";
-import { loginSchema, type LoginSchemaType } from "~/schema/auth";
+import { registerSchema, type RegisterSchemaType } from "~/schema/auth";
 import { useMyAuthStore } from "~/store/auth";
 
 definePageMeta({
@@ -9,22 +9,22 @@ definePageMeta({
 
 const loading = ref(false);
 
-const authStore = useMyAuthStore();
-
 const state = reactive({
+  name: undefined,
   email: undefined,
   password: undefined,
 });
 
 const toast = useToast();
 
-async function onSubmit(event: FormSubmitEvent<LoginSchemaType>) {
+async function onSubmit(event: FormSubmitEvent<RegisterSchemaType>) {
   loading.value = true;
 
   try {
-    const res = await $fetch("/api/login", {
+    const res = await $fetch("/api/register", {
       method: "POST",
       body: {
+        name: event.data.name,
         email: event.data.email,
         password: event.data.password,
       },
@@ -32,25 +32,23 @@ async function onSubmit(event: FormSubmitEvent<LoginSchemaType>) {
 
     if (res.success) {
       toast.add({
-        title: "Login Successful",
-        description: "You have successfully signed in to the system.",
+        title: "Registration Successful",
+        description: "Your account has been created. You are now can sign in.",
         color: "success",
       });
 
-      authStore.user = res.user;
-      authStore.token = res.token;
-
-      navigateTo("/tasks");
+      navigateTo("/");
     } else {
       toast.add({
-        title: "Login Failed",
-        description: "Incorrect username or password. Please try again.",
+        title: "Registration Failed",
+        description:
+          "The username is already in use. Please choose a different one.",
         color: "error",
       });
     }
   } catch (err) {
     toast.add({
-      title: "Login Failed",
+      title: "Registration Failed",
       description: "A server error occurred. Please try again later.",
       color: "error",
     });
@@ -83,20 +81,12 @@ const isDark = computed({
 const toggleColorMode = () => {
   isDark.value = !isDark.value;
 };
-
-onMounted(() => {
-  if (!authStore.isTokenExpired) {
-    navigateTo("/dashboard");
-  }
-});
 </script>
 
 <template>
   <div
     class="flex items-center p-5 md:p-0 h-screen bg-background relative justify-start md:justify-evenly flex-col md:flex-row"
   >
-    <icons-login class="w-40 md:w-96 h-auto mb-10 mt-5 md:mt-0 md:mb-0" />
-
     <u-button
       :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
       color="primary"
@@ -106,27 +96,40 @@ onMounted(() => {
       class="-my-1 right-5 top-5 md:right-10 md:top-10 absolute"
     />
 
+    <div
+      class="left-5 top-5 md:left-10 md:top-10 absolute flex gap-2 mb-3 items-center"
+    >
+      <img src="/favicon.svg" width="45" height="45" color="white" />
+
+      <div>
+        <h1 class="text-xl font-bold text-primary">WorkNerve</h1>
+        <p class="text-sm">Your Personal Working Assistant</p>
+      </div>
+    </div>
+
     <h1 class="absolute bottom-5 text-xs text-center text-muted-foreground">
       Copyright @ Dwi Wahyu Ilahi Angka
     </h1>
 
-    <u-card class="max-w-xl p-6 space-y-4 shadow">
-      <div class="flex gap-2 mb-3 items-center">
-        <img src="/favicon.svg" width="50" height="50" color="white" />
-
-        <div>
-          <h1 class="text-xl font-bold text-primary">WorkNerve</h1>
-          <p class="text-sm">Your Personal Working Assistant</p>
-        </div>
+    <u-card class="w-md p-6 space-y-4 shadow">
+      <div>
+        <h1 class="text-xl font-bold text-primary">Register</h1>
+        <p class="mt-1 text-sm mb-3">
+          Create your account to get started with your personal task assistant.
+        </p>
       </div>
 
       <u-form
-        :schema="loginSchema"
+        :schema="registerSchema"
         :state="state"
         class="space-y-4 pt-2"
         @submit="onSubmit"
         @error="onError"
       >
+        <u-form-field label="Name" name="name">
+          <u-input class="w-full" v-model="state.name" placeholder="John Doe" />
+        </u-form-field>
+
         <u-form-field label="Email" name="email">
           <u-input
             class="w-full"
@@ -143,18 +146,18 @@ onMounted(() => {
           />
         </u-form-field>
 
-        <div class="grid grid-cols-1 gap-2 md:grid-cols-2">
-          <u-button type="submit" block color="primary" :loading="loading">
-            Login
-          </u-button>
+        <div class="grid grid-cols-1 mt-5 gap-2 md:grid-cols-2">
           <u-button
             type="button"
             block
             color="primary"
             variant="outline"
-            @click="navigateTo('/register')"
+            @click="navigateTo('/')"
           >
-            Register
+            Login
+          </u-button>
+          <u-button type="submit" block color="primary" :loading="loading">
+            Submit
           </u-button>
         </div>
       </u-form>

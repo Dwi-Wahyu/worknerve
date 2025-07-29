@@ -25,10 +25,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return {
-      success: true,
-      credential,
-    };
+    return credential;
   } catch (error: any) {
     console.error("Error fetching credential:", error);
     throw createError({

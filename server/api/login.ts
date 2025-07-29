@@ -1,6 +1,6 @@
 import { compareSync } from "bcrypt";
 import prisma from "~/lib/prisma";
-import { loginSchema, LoginSchemaType } from "~/schema/login";
+import { loginSchema, LoginSchemaType } from "~/schema/auth";
 import jwt from "jsonwebtoken";
 
 export default defineEventHandler(async (event) => {

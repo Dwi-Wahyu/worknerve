@@ -2,12 +2,33 @@
   <div class="flex items-center justify-center">
     <u-card class="w-2xl">
       <h1 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">
-        Tambah Kredensial Baru
+        Edit Credential
       </h1>
 
+      <div v-if="pending" class="flex justify-center items-center h-64">
+        <u-icon name="i-lucide-loader" class="size-5 animate-spin" />
+        <p class="ml-3 text-lg text-gray-600 dark:text-gray-300">
+          Loading Credential ...
+        </p>
+      </div>
+
+      <u-alert
+        v-else-if="error"
+        icon="i-heroicons-exclamation-triangle"
+        color="error"
+        variant="soft"
+        title="Gagal Loading Task"
+        :description="
+          error.message ||
+          'Terjadi kesalahan saat mengambil data tugas. Silakan coba lagi nanti.'
+        "
+        class="mb-6"
+      />
+
       <u-form
+        v-else
         :state="state"
-        :schema="createCredentialSchema"
+        :schema="updateCredentialSchema"
         class="space-y-6"
         @submit="onSubmit"
       >
@@ -44,24 +65,6 @@
           />
         </u-form-field>
 
-        <u-form-field label="Server ID (Opsional)" name="serverId">
-          <u-input
-            v-model="state.serverId"
-            placeholder="ID Server terkait (angka)"
-            class="w-full"
-            type="number"
-          />
-        </u-form-field>
-
-        <u-form-field label="Application ID (Opsional)" name="applicationId">
-          <u-input
-            v-model="state.applicationId"
-            placeholder="ID Aplikasi terkait (angka)"
-            class="w-full"
-            type="number"
-          />
-        </u-form-field>
-
         <div class="flex justify-center gap-4">
           <u-button
             type="button"
@@ -80,7 +83,7 @@
             :loading="loading"
             :disabled="loading"
           >
-            Tambahkan Kredensial
+            Tambahkan Credential
           </u-button>
         </div>
       </u-form>
@@ -92,30 +95,52 @@
 import type { FormSubmitEvent } from "@nuxt/ui";
 import { ref } from "vue";
 import {
-  createCredentialSchema,
-  type CreateCredentialSchemaType,
+  updateCredentialSchema,
+  type UpdateCredentialSchemaType,
 } from "~/schema/credentials";
 import { useMyAuthStore } from "~/store/auth";
 
 const toast = useToast();
 const loading = ref(false);
 
+const route = useRoute();
+const { id } = route.params;
+
 const authStore = useMyAuthStore();
 
-const state = reactive({
+const state = ref({
   title: "",
   key: "",
   value: "",
   description: "",
   serverId: undefined as number | undefined,
   applicationId: undefined as number | undefined,
+  id: "",
 });
 
-async function onSubmit(event: FormSubmitEvent<CreateCredentialSchemaType>) {
+const { pending, error } = await useMyFetch<Credential>(
+  "/api/credentials/" + id,
+  {
+    onResponse: ({ response }) => {
+      state.value = {
+        title: response._data.title,
+        key: response._data.key,
+        value: response._data.value,
+        description: response._data.description,
+        serverId: response._data.serverId,
+        applicationId: response._data.applicationId,
+        id: response._data.id,
+      };
+    },
+    lazy: true,
+  }
+);
+
+async function onSubmit(event: FormSubmitEvent<UpdateCredentialSchemaType>) {
   loading.value = true;
   try {
     const response = await $fetch("/api/credentials", {
-      method: "POST",
+      method: "PATCH",
       body: {
         title: event.data.title,
         key: event.data.key,
@@ -123,28 +148,38 @@ async function onSubmit(event: FormSubmitEvent<CreateCredentialSchemaType>) {
         description: event.data.description,
         serverId: event.data.serverId || null,
         applicationId: event.data.applicationId || null,
-        userId: authStore.user?.id,
+        id: event.data.id,
       },
       headers: {
         Authorization: `Bearer ${authStore.token}`,
       },
     });
 
-    toast.add({
-      title: "Kredensial Berhasil Ditambahkan!",
-      description: `Kredensial telah berhasil dibuat.`,
-      icon: "i-heroicons-check-circle",
-      color: "success",
-    });
+    if (response.success) {
+      toast.add({
+        title: "Credential Saved Successfully!",
+        description: "Your changes have been applied.",
+        icon: "i-heroicons-check-circle",
+        color: "success",
+      });
 
-    navigateTo("/credentials");
+      navigateTo("/credentials");
+    } else {
+      toast.add({
+        title: "Failed to Save Credential",
+        description:
+          "An error occurred while saving the credential. Please try again.",
+        icon: "i-heroicons-exclamation-triangle",
+        color: "error",
+      });
+    }
   } catch (err: any) {
     console.error("Gagal menambahkan kredensial:", err);
     toast.add({
-      title: "Gagal Menambahkan Kredensial",
+      title: "Failed to Save Credential",
       description:
         err.data?.message ||
-        "Terjadi kesalahan saat menyimpan kredensial. Silakan coba lagi.",
+        "An error occurred while saving the credential. Please try again.",
       icon: "i-heroicons-exclamation-triangle",
       color: "error",
     });

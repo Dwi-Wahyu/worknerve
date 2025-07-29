@@ -17,7 +17,7 @@
         icon="i-heroicons-exclamation-triangle"
         color="error"
         variant="soft"
-        title="Gagal Memuat Tugas"
+        title="Gagal Loading Task"
         :description="
           error.message ||
           'Terjadi kesalahan saat mengambil data tugas. Silakan coba lagi nanti.'

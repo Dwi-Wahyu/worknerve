@@ -162,7 +162,7 @@ async function handleChangeStatus(status: string) {
 
   if (response.success) {
     toast.add({
-      title: "Status Berhasil Diganti!",
+      title: "Status Has Changed!",
       icon: "i-heroicons-check-circle",
       color: "success",
     });
@@ -188,7 +188,7 @@ async function handleHapus() {
 
   if (response.success) {
     toast.add({
-      title: "Task berhasil dihapus!",
+      title: "Task Deleted Successfully!",
       icon: "i-heroicons-check-circle",
       color: "success",
     });

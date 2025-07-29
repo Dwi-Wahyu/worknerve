@@ -23,7 +23,9 @@ const {
 </script>
 
 <template>
-  <u-card>
+  <!-- <CredentialsAuthPinModal /> -->
+
+  <u-card class="shadow">
     <template #header>
       <div class="flex justify-between items-center w-full">
         <div>
@@ -85,7 +87,16 @@ const {
             </tr>
           </thead>
           <tbody>
+            <tr v-if="!credentials.length">
+              <td colspan="5" class="text-center py-6 text-muted-foreground">
+                <div class="flex flex-col items-center justify-center gap-2">
+                  <Icon name="lucide:trash" class="w-6 h-6" />
+                  <span class="text-lg">No credentials found.</span>
+                </div>
+              </td>
+            </tr>
             <tr
+              v-else
               class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
               v-for="(row, idRow) in credentials"
               :key="idRow"
@@ -102,12 +113,10 @@ const {
                   icon="lucide:square-pen"
                   class="mr-2"
                   variant="outline"
+                  @click="navigateTo('/credentials/' + row.id)"
                 />
-                <u-button
-                  icon="lucide:trash-2"
-                  variant="outline"
-                  color="error"
-                />
+
+                <CredentialsDeleteModal :credential="row" :refresh="refresh" />
               </td>
             </tr>
           </tbody>
