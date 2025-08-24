@@ -32,6 +32,11 @@ const navigationItems = ref<NavigationMenuItem[]>([
     to: "/dashboard",
   },
   {
+    label: "Pomodoro",
+    icon: "lucide:timer",
+    to: "/pomodoro",
+  },
+  {
     label: "Task",
     icon: "lucide:notebook",
     to: "/tasks",
@@ -54,6 +59,13 @@ const dropdownItems = ref<DropdownMenuItem[]>([
     icon: "lucide:layout-dashboard",
     onSelect() {
       navigateTo("/dashboard");
+    },
+  },
+  {
+    label: "Pomodoro",
+    icon: "lucide:timer",
+    onSelect() {
+      navigateTo("/pomodoro");
     },
   },
   {

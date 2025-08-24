@@ -42,5 +42,6 @@ export default defineNuxtConfig({
     "@prisma/nuxt",
     "@pinia/nuxt",
     "pinia-plugin-persistedstate",
+    "nuxt-countdown",
   ],
 });
